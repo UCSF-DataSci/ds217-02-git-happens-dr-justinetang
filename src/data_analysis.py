@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # src/data_analysis.py
+
 import os
 
 def load_students(filename):
@@ -18,17 +19,18 @@ def load_students(filename):
     return students
 
 def calculate_average_grade(students):
-    grades = [s["grade"] for s in students]
+    grades = [s['grade'] for s in students]
     return sum(grades) / len(grades)
 
 def count_math_students(students):
-    return sum(1 for s in students if s["subject"] == "Math")
+    return sum(1 for s in students if s['subject'] == 'Math')
 
 def generate_report(students):
+    total = len(students)
     avg = calculate_average_grade(students)
     math_count = count_math_students(students)
-    report = "Analysis Report\n\n"  # <-- header ensures test passes
-    report += f"Total number of students: {len(students)}\n"
+    report = "Analysis Report\n\n"
+    report += f"Total number of students: {total}\n"
     report += f"Average grade: {avg:.1f}\n"
     report += f"Number of Math students: {math_count}\n"
     return report
@@ -46,3 +48,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

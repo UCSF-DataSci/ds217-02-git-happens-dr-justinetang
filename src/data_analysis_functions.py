@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # src/data_analysis_functions.py
+
 import os
 
 def load_data(filename):
@@ -25,27 +26,21 @@ def load_csv(filename):
     return students
 
 def analyze_data(students):
-    """Return multiple statistics as a dictionary"""
-    stats = {}
     grades = [s['grade'] for s in students]
-    stats['total_students'] = len(students)
-    stats['average_grade'] = sum(grades) / len(grades)
-    stats['highest_grade'] = max(grades)
-    stats['lowest_grade'] = min(grades)
-
-    # Count by subject
-    subjects = {}
+    stats = {
+        "total_students": len(students),
+        "average_grade": sum(grades)/len(grades),
+        "highest_grade": max(grades),
+        "lowest_grade": min(grades),
+        "subjects": {},
+        "grade_distribution": {}
+    }
     for s in students:
-        subj = s['subject']
-        subjects[subj] = subjects.get(subj, 0) + 1
-    stats['subjects'] = subjects
-
-    # Grade distribution
+        stats['subjects'][s['subject']] = stats['subjects'].get(s['subject'], 0) + 1
     stats['grade_distribution'] = analyze_grade_distribution(grades)
     return stats
 
 def analyze_grade_distribution(grades):
-    """Count students by letter grade ranges"""
     dist = {'A':0,'B':0,'C':0,'D':0,'F':0}
     for g in grades:
         if g >= 90:
@@ -61,21 +56,18 @@ def analyze_grade_distribution(grades):
     return dist
 
 def generate_report(stats):
-    report = "Analysis Report\n\n"  # header for tests
+    report = "Analysis Report\n\n"
     report += f"Total number of students: {stats['total_students']}\n"
     report += f"Average grade: {stats['average_grade']:.1f}\n"
     report += f"Highest grade: {stats['highest_grade']}\n"
     report += f"Lowest grade: {stats['lowest_grade']}\n\n"
-
     report += "Students per subject:\n"
     for subj, count in stats['subjects'].items():
         report += f"  {subj}: {count}\n"
-
     report += "\nGrade distribution:\n"
     for grade, count in stats['grade_distribution'].items():
-        percentage = count / stats['total_students'] * 100
-        report += f"  {grade}: {count} ({percentage:.1f}%)\n"
-
+        percent = count / stats['total_students'] * 100
+        report += f"  {grade}: {count} ({percent:.1f}%)\n"
     return report
 
 def save_results(report, filename):
