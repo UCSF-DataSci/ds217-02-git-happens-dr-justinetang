@@ -10,74 +10,84 @@ def load_data(filename):
         raise ValueError("Unsupported file type")
 
 def load_csv(filename):
-    """Load CSV file and return list of student dictionaries"""
+    """Load CSV data into a list of student dictionaries"""
     students = []
     with open(filename, 'r') as f:
         lines = f.readlines()[1:]  # skip header
         for line in lines:
             name, age, grade, subject = line.strip().split(',')
             students.append({
-                'name': name,
-                'age': int(age),
-                'grade': int(grade),
-                'subject': subject
+                "name": name,
+                "age": int(age),
+                "grade": int(grade),
+                "subject": subject
             })
     return students
 
+def analyze_data(students):
+    """Return multiple statistics as a dictionary"""
+    stats = {}
+    grades = [s['grade'] for s in students]
+    stats['total_students'] = len(students)
+    stats['average_grade'] = sum(grades) / len(grades)
+    stats['highest_grade'] = max(grades)
+    stats['lowest_grade'] = min(grades)
+
+    # Count by subject
+    subjects = {}
+    for s in students:
+        subj = s['subject']
+        subjects[subj] = subjects.get(subj, 0) + 1
+    stats['subjects'] = subjects
+
+    # Grade distribution
+    stats['grade_distribution'] = analyze_grade_distribution(grades)
+    return stats
+
 def analyze_grade_distribution(grades):
-    """Count letter grades (A-F)"""
+    """Count students by letter grade ranges"""
     dist = {'A':0,'B':0,'C':0,'D':0,'F':0}
     for g in grades:
-        if 90 <= g <= 100:
+        if g >= 90:
             dist['A'] += 1
-        elif 80 <= g <= 89:
+        elif g >= 80:
             dist['B'] += 1
-        elif 70 <= g <= 79:
+        elif g >= 70:
             dist['C'] += 1
-        elif 60 <= g <= 69:
+        elif g >= 60:
             dist['D'] += 1
         else:
             dist['F'] += 1
     return dist
 
-def analyze_data(students):
-    """Return dictionary with statistics"""
-    total = len(students)
-    grades = [s['grade'] for s in students]
-    subjects = {}
-    for s in students:
-        subjects[s['subject']] = subjects.get(s['subject'], 0) + 1
+def generate_report(stats):
+    report = "Analysis Report\n\n"  # header for tests
+    report += f"Total number of students: {stats['total_students']}\n"
+    report += f"Average grade: {stats['average_grade']:.1f}\n"
+    report += f"Highest grade: {stats['highest_grade']}\n"
+    report += f"Lowest grade: {stats['lowest_grade']}\n\n"
 
-    grade_dist = analyze_grade_distribution(grades)
+    report += "Students per subject:\n"
+    for subj, count in stats['subjects'].items():
+        report += f"  {subj}: {count}\n"
 
-    return {
-        'total': total,
-        'average': sum(grades)/total,
-        'highest': max(grades),
-        'lowest': min(grades),
-        'subjects': subjects,
-        'grade_distribution': grade_dist
-    }
+    report += "\nGrade distribution:\n"
+    for grade, count in stats['grade_distribution'].items():
+        percentage = count / stats['total_students'] * 100
+        report += f"  {grade}: {count} ({percentage:.1f}%)\n"
 
-def save_results(results, filename):
+    return report
+
+def save_results(report, filename):
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as f:
-        f.write(f"Total number of students: {results['total']}\n")
-        f.write(f"Average grade: {results['average']:.1f}\n")
-        f.write(f"Highest grade: {results['highest']}\n")
-        f.write(f"Lowest grade: {results['lowest']}\n\n")
-        f.write("Students per subject:\n")
-        for sub, count in results['subjects'].items():
-            f.write(f"  {sub}: {count}\n")
-        f.write("\nGrade distribution:\n")
-        for grade, count in results['grade_distribution'].items():
-            percent = (count/results['total'])*100
-            f.write(f"  {grade}: {count} ({percent:.1f}%)\n")
+        f.write(report)
 
 def main():
     students = load_data('data/students.csv')
-    results = analyze_data(students)
-    save_results(results, 'output/analysis_report.txt')
+    stats = analyze_data(students)
+    report = generate_report(stats)
+    save_results(report, 'output/analysis_report.txt')
     print("Advanced analysis complete. Report saved to output/analysis_report.txt")
 
 if __name__ == "__main__":
