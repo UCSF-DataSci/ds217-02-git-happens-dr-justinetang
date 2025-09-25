@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-# TODO: Implement advanced analysis
-def main():
-    pass
-=======
 #!/usr/bin/env python3
 # src/data_analysis_functions.py
 import os
@@ -84,7 +79,6 @@ def main():
     results = analyze_data(students)
     save_results(results, 'output/analysis_report.txt')
     print("Advanced analysis complete. Report saved to output/analysis_report.txt")
->>>>>>> feature/data-processing
 
 if __name__ == "__main__":
     main()
